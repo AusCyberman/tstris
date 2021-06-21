@@ -1,7 +1,7 @@
 export enum Direction {
-    Up,
     Down,
     Left,
+    Up,
     Right
 }
 export class Vector2 {
@@ -16,6 +16,9 @@ export class Vector2 {
     }
     scale(factor : number) : Vector2 {
         return new Vector2(this.x*factor,this.y*factor)
+    }
+    string() {
+        return `${this.x} ,  ${this.y}`
     }
 }
 

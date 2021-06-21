@@ -1,5 +1,6 @@
 import { GameObject } from '../GameObject'
 import { V2, Vector2, Direction } from '../geo/Vector2'
+
 export enum ShapeType {
     I = 0,
     J,
@@ -10,11 +11,19 @@ export enum ShapeType {
     Z,
 }
 
-type ShapeCoords = [Vector2, Vector2, Vector2, Vector2]
+export type ValidMove = "valid" | "stop" | "block"
+
+export type BlockMap = Map<string, number>
+
+export type ShapeCoords = [Vector2, Vector2, Vector2, Vector2]
 
 type ShapeData = {
     rotate: (d: Direction) => ShapeCoords
     color: string
+}
+
+export function random_shape() : ShapeType {
+    return Math.floor(Math.random() * ShapeType.Z)
 }
 
 export function shape_factory(shape: ShapeType): ShapeData {
@@ -25,34 +34,105 @@ export function shape_factory(shape: ShapeType): ShapeData {
                     switch (direction) {
                         case Direction.Up:
                         case Direction.Down:
-                            return [V2(0, 0), V2(0, 1), V2(0, 2), V2(0, 3)]
+                            return [V2(2, 0), V2(2, 1), V2(2, 2), V2(2, 3)]
                         case Direction.Right:
                         case Direction.Left:
-                            return [V2(3, 0), V2(3, 1), V2(3, 2), V2(3, 3)]
+                            return [V2(0, 1), V2(1, 1), V2(2, 1), V2(3, 1)]
                     }
                 },
                 color: "cyan"
             }
         case ShapeType.J:
             return {
-                rotate(direction : Direction) : ShapeCoords {
+                rotate(direction: Direction): ShapeCoords {
                     switch (direction) {
                         case Direction.Down:
-                            return [V2(0, 0), V2(1, 0), V2(1, 1), V2(1, 2)]
+                            return [V2(0, 1), V2(0, 2), V2(1, 2), V2(2, 2)]
+                        case Direction.Up:
+                            return [V2(0, 1), V2(1, 1), V2(2, 1), V2(2, 2)]
+                        case Direction.Left:
+                            return [V2(1, 0), V2(2, 0), V2(1, 1), V2(1, 2)]
+                        case Direction.Right:
+                            return [V2(1, 0), V2(1, 1), V2(0, 2), V2(1, 2)]
+
                     }
                 },
                 color: "darkblue"
             }
-   //     case ShapeType.L:
-   //         return [V2(2, 0), V2(0, 1), V2(1, 1), V2(2, 1)]
-   //     case ShapeType.O:
-   //         return [V2(0, 0), V2(0, 1), V2(1, 0), V2(1, 1)];
-   //     case ShapeType.S:
-   //         return [V2(1, 0), V2(2, 0), V2(0, 1), V2(1, 1)]
-   //     case ShapeType.T:
-   //         return [V2(1, 0), V2(0, 1), V2(1, 1), V2(2, 1)]
-   //     case ShapeType.Z:
-   //         return [V2(0, 0), V2(1, 0), V2(1, 1), V2(2, 1)]
+        case ShapeType.L:
+            return {
+                rotate(direction: Direction): ShapeCoords {
+                    switch (direction) {
+                        case Direction.Down:
+                            return [V2(2, 1), V2(0, 2), V2(1, 2), V2(2, 2)]
+                        case Direction.Up:
+                            return [V2(0, 1), V2(1, 1), V2(2, 1), V2(0, 2)]
+                        case Direction.Left:
+                            return [V2(1, 0), V2(2, 2), V2(1, 1), V2(1, 2)]
+                        case Direction.Right:
+                            return [V2(1, 0), V2(1, 1), V2(0, 0), V2(1, 2)]
+
+                    }
+                },
+                color: "orange"
+            }
+        case ShapeType.O:
+            return {
+                rotate(direction: Direction): ShapeCoords {
+                    return [V2(0, 0), V2(0, 1), V2(1, 0), V2(1, 1)]
+                },
+                color: "yellow"
+            }
+        case ShapeType.S:
+            return {
+                rotate(direction: Direction) {
+                    switch (direction) {
+                        case Direction.Up:
+                        case Direction.Down:
+                            return [V2(1, 1), V2(2, 1), V2(0, 2), V2(1, 2)]
+                        case Direction.Left:
+                        case Direction.Right:
+                            return [V2(0, 0), V2(0, 1), V2(1, 1), V2(1, 2)]
+                    }
+
+                },
+                color: "green"
+            }
+        case ShapeType.T:
+            return {
+                rotate(direction: Direction) {
+                    switch (direction) {
+                        case Direction.Down:
+                            return [V2(1, 1), V2(0, 2), V2(1, 2), V2(2, 2)]
+                        case Direction.Left:
+                            return [V2(1, 0), V2(1, 1), V2(2, 1), V2(1, 2)]
+                        case Direction.Up:
+                            return [V2(0, 1), V2(1, 1), V2(2, 1), V2(1, 2)]
+                        case Direction.Right:
+                            return [V2(1, 0), V2(0, 1), V2(1, 1), V2(1, 2)]
+                    }
+                },
+                color: "purple"
+
+            }
+
+        case ShapeType.Z:
+            return {
+                rotate(direction: Direction) {
+                    switch (direction) {
+                        case Direction.Up:
+                        case Direction.Down:
+                            return [V2(0, 1), V2(1, 1), V2(1, 2), V2(2, 2)]
+                        case Direction.Left:
+                        case Direction.Right:
+                            return [V2(2, 0), V2(1, 1), V2(2, 1), V2(1, 2)]
+                    }
+
+
+                    //                    return [V2(0, 0), V2(1, 0), V2(1, 1), V2(2, 1)]
+                },
+                color: "red"
+            }
     }
 }
 
@@ -65,39 +145,114 @@ export class Shape extends GameObject {
     shape: ShapeType
     location: Vector2
     shape_vec: ShapeCoords
-    color : string
+    stopped: boolean
+    color: string
     rotation: Direction
+    bottomRHS: Vector2
     private rotateF: (direction: Direction) => ShapeCoords
-    rotate(direction: Direction) {
-        this.shape_vec = this.rotateF(direction)
+    rotate(direction: Direction, blockMap: BlockMap) {
+        if (!this.stopped) {
+
+
+            if (blockMap != null) {
+                let exist = false
+                let new_coords = this.rotateF(direction)
+                switch (this.validate(this.construct_coords(new_coords), blockMap)) {
+                    case "valid":
+                        this.shape_vec = new_coords
+                        this.rotation = direction
+                        break
+                    case "stop":
+                        this.stopped = true
+                        break
+                }
+            } else {
+                this.rotation = direction
+                this.shape_vec = this.rotateF(direction)
+            }
+        }
+    }
+    validate(vec: Vector2[], blockMap: BlockMap): ValidMove {
+        let exist = false
+        for (const b of vec) {
+            if (blockMap.has(b.string())) {
+                console.log("has")
+                exist = true
+                if (this.shape_vec.some((e) => e.y < b.y && e.x == b.x)) {
+                    return "stop"
+                }
+            } else if (b.x > this.bottomRHS.x || b.x < 0) {
+            console.log(b.x)
+                exist = true
+            }
+            if (this.bottomRHS.y < b.y) {
+                return "stop"
+            }
+
+        }
+        if (exist) {
+            return "block"
+        }
+        return "valid"
+
+    }
+    construct_coords(vec: ShapeCoords = this.shape_vec, location: Vector2 = this.location): Vector2[] {
+        return vec.map(e => {
+            let a = V2(e.x * 10, e.y * 10)
+            return a.add(location)
+        })
+
     }
 
-    constructor(shape: ShapeType, location: Vector2, rotation = Direction.Down) {
+    move(direction: Direction, blockMap: BlockMap) {
+        let new_loc = V2(this.location.x,this.location.y)
+        if (!this.stopped) {
+            switch (direction) {
+                case Direction.Left:
+                    new_loc.x-=10
+                    break
+                case Direction.Right:
+                    new_loc.x+=10
+                    break
+                case Direction.Down:
+                    new_loc.y+=10
+            }
+            const status =  this.validate(this.construct_coords(this.shape_vec, new_loc), blockMap)
+            console.log(status)
+            switch (status) {
+                case "valid":
+                    this.location = new_loc
+                    return
+                case "stop":
+                    console.log(new_loc)
+                    this.stopped = true
+                    break
+                case "block":
+                    console.log("nothing")
+            }
+        }
+    }
+    constructor(shape: ShapeType, location: Vector2, bottomRHS: Vector2, rotation = Direction.Down) {
         super()
         this.location = location
+        this.bottomRHS = bottomRHS
         this.shape = shape
-        const {rotate, color} = shape_factory(this.shape)
+        const { rotate, color } = shape_factory(this.shape)
         this.rotateF = rotate
-        this.rotate(rotation)
+        this.rotate(rotation, null)
         this.color = color
         this.rotation = rotation
     }
-    down() {
-        this.location.x++
-        this.location.y++
-
-    }
     draw(ctx: CanvasRenderingContext2D): void {
+        ctx.save()
         ctx.fillStyle = this.color
+        console.log(`${ctx.fillStyle} , ${this.color}`)
         ctx.strokeStyle = "black"
-        this.shape_vec.map(e => {
-            let a = V2(e.x * 10, e.y * 10)
-            return a.add(this.location)
-        }).forEach(e => {
-            console.log(e)
+        this.construct_coords().forEach(e => {
             ctx.rect(e.x, e.y, 10, 10)
             ctx.fill()
             ctx.stroke()
         })
+        ctx.restore()
     }
 }
