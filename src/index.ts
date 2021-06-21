@@ -44,7 +44,7 @@ class Game {
         return val
     }
     makeRandomShape(location: Vector2 = V2(0, 0)) {
-        return new Shape(random_shape(), location, this.gameBottomRHS,this.blockSize)
+        return new Shape(random_shape(), location, this.gameBottomRHS, this.blockSize)
     }
     checkScore() {
         this.blockMap.forEach((row, num) => {
@@ -136,7 +136,7 @@ class Game {
     draw() {
         this.ctx.clearRect(this.startingGame.x, this.startingGame.y, this.width + 2, this.height + 2)
         this.ctx.beginPath()
-        this.ctx.clearRect(this.width + 20, 0, 10*this.blockSize, this.blockSize * 80)
+        this.ctx.clearRect(this.width + 20, 0, 10 * this.blockSize, this.blockSize * 80)
         this.ctx.beginPath()
         this.drawScore()
         this.drawUpcomingAndHeld()
@@ -173,16 +173,16 @@ function tick(g: Game) {
         g.currentBlock.location = g.randomSpawnLocation()
         g.upcoming.push(g.makeRandomShape())
     }
-    g.currentBlock.move(Direction.Down, g.blockMap)
+
     if (g.currentBlock.stopped) {
         for (const a of g.currentBlock.construct_coords()) {
             console.log(g.blockMap)
-            console.log(a.y,a.x)
-            if(a.y <= 0 ){
+            console.log(a.y, a.x)
+            if (a.y <= 0) {
                 g.ctx.fillStyle = "red"
                 g.ctx.font = "30px Bold"
-                g.ctx.fillText("GAME OVER",(g.startingGame.x+g.width)/2-60,g.startingGame.y+(g.height/2-40))
-                return 
+                g.ctx.fillText("GAME OVER", (g.startingGame.x + g.width) / 2 - 60, g.startingGame.y + (g.height / 2 - 40))
+                return
             }
             g.blockMap[a.y][a.x] = g.currentBlock.color
         }
@@ -190,9 +190,7 @@ function tick(g: Game) {
         g.currentBlock = null
     }
     g.draw()
-    window.requestAnimationFrame(() => setTimeout(() => {
-        tick(g)
-    }, 100))
+    window.requestAnimationFrame(() => tick(g))
 }
 
 
@@ -201,6 +199,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
     const game = new Game(ctx, V2(280, 600), V2(800, 800), V2(0, 0), 20)
+    window.setInterval(() => {
+        if(game.currentBlock != null) {
+            game.currentBlock.move(Direction.Down, game.blockMap)
+        }
+    },1000)
     document.addEventListener("keydown", (event) => {
         switch (event.key) {
             case "ArrowRight":
