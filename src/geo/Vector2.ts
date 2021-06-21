@@ -4,6 +4,29 @@ export enum Direction {
     Up,
     Right
 }
+
+
+
+
+export class VectorMap<T>  extends Map<Vector2,T>{
+    has(e : Vector2) {
+        var exist = false
+       this.forEach((_,k) => {
+            if(k.x  == e.x && e.y == k.y)
+                exist = true
+       }) 
+        return exist
+
+    }
+    deleteKeys(vs : Vector2[]) {
+        this.forEach((_,k) => {
+            if(vs.some(e => k.x == e.x && k.y == e.y)) {
+                this.delete(k)
+            }
+        })
+    }
+
+}
 export class Vector2 {
     x: number
     y: number
@@ -17,8 +40,9 @@ export class Vector2 {
     scale(factor : number) : Vector2 {
         return new Vector2(this.x*factor,this.y*factor)
     }
-    string() {
-        return `${this.x} ,  ${this.y}`
+    
+    toTuple()  : [number, number]{
+        return [this.x,this.y]
     }
 }
 

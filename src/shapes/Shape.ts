@@ -1,5 +1,5 @@
 import { GameObject } from '../GameObject'
-import { V2, Vector2, Direction } from '../geo/Vector2'
+import { V2, Vector2, Direction, VectorMap } from '../geo/Vector2'
 
 export enum ShapeType {
     I = 0,
@@ -13,7 +13,7 @@ export enum ShapeType {
 
 export type ValidMove = "valid" | "stop" | "block"
 
-export type BlockMap = Map<string, number>
+export type BlockMap = string[][]
 
 export type ShapeCoords = [Vector2, Vector2, Vector2, Vector2]
 
@@ -22,7 +22,7 @@ type ShapeData = {
     color: string
 }
 
-export function random_shape() : ShapeType {
+export function random_shape(): ShapeType {
     return Math.floor(Math.random() * ShapeType.Z)
 }
 
@@ -142,12 +142,14 @@ export class Shape extends GameObject {
     area(): number {
         return 4
     }
+    blockSize: number
     shape: ShapeType
     location: Vector2
     shape_vec: ShapeCoords
     stopped: boolean
     color: string
     rotation: Direction
+    topLHS: Vector2
     bottomRHS: Vector2
     private rotateF: (direction: Direction) => ShapeCoords
     rotate(direction: Direction, blockMap: BlockMap) {
@@ -175,18 +177,24 @@ export class Shape extends GameObject {
     validate(vec: Vector2[], blockMap: BlockMap): ValidMove {
         let exist = false
         for (const b of vec) {
-            if (blockMap.has(b.string())) {
-                console.log("has")
-                exist = true
-                if (this.shape_vec.some((e) => e.y < b.y && e.x == b.x)) {
-                    return "stop"
-                }
-            } else if (b.x > this.bottomRHS.x || b.x < 0) {
-            console.log(b.x)
+            if (b.x >= ((this.topLHS.x + this.bottomRHS.x) / this.blockSize) || b.x < 0) {
+                console.log(b.x)
                 exist = true
             }
-            if (this.bottomRHS.y < b.y) {
+            console.log("B VALUES ARE: ", b.x, b.y)
+            console.log("TOTAL SIZE: ", ((this.bottomRHS.y - this.topLHS.y) / this.blockSize))
+            console.log("MAP SIZE: ",blockMap.length)
+            if (((this.bottomRHS.y - this.topLHS.y) / this.blockSize) <= b.y) {
+                console.log("its out")
                 return "stop"
+            } else if (blockMap[b.y][b.x] != null) {
+                console.log("has")
+                exist = true
+                if (this.construct_coords().some((e) => {
+                    return e.y < b.y && e.x == b.x
+                })) {
+                    return "stop"
+                }
             }
 
         }
@@ -198,33 +206,32 @@ export class Shape extends GameObject {
     }
     construct_coords(vec: ShapeCoords = this.shape_vec, location: Vector2 = this.location): Vector2[] {
         return vec.map(e => {
-            let a = V2(e.x * 10, e.y * 10)
+            let a = V2(e.x, e.y)
             return a.add(location)
         })
 
     }
 
     move(direction: Direction, blockMap: BlockMap) {
-        let new_loc = V2(this.location.x,this.location.y)
+        let new_loc = V2(this.location.x, this.location.y)
         if (!this.stopped) {
             switch (direction) {
                 case Direction.Left:
-                    new_loc.x-=10
+                    new_loc.x -= 1
                     break
                 case Direction.Right:
-                    new_loc.x+=10
+                    new_loc.x += 1
                     break
                 case Direction.Down:
-                    new_loc.y+=10
+                    new_loc.y += 1
             }
-            const status =  this.validate(this.construct_coords(this.shape_vec, new_loc), blockMap)
+            const status = this.validate(this.construct_coords(this.shape_vec, new_loc), blockMap)
             console.log(status)
             switch (status) {
                 case "valid":
                     this.location = new_loc
                     return
                 case "stop":
-                    console.log(new_loc)
                     this.stopped = true
                     break
                 case "block":
@@ -232,10 +239,12 @@ export class Shape extends GameObject {
             }
         }
     }
-    constructor(shape: ShapeType, location: Vector2, bottomRHS: Vector2, rotation = Direction.Down) {
+    constructor(shape: ShapeType, location: Vector2, bottomRHS: Vector2, blockSize = 10, rotation = Direction.Down, topLHS: Vector2 = V2(0, 0)) {
         super()
+        this.blockSize = blockSize
         this.location = location
         this.bottomRHS = bottomRHS
+        this.topLHS = topLHS
         this.shape = shape
         const { rotate, color } = shape_factory(this.shape)
         this.rotateF = rotate
@@ -244,12 +253,15 @@ export class Shape extends GameObject {
         this.rotation = rotation
     }
     draw(ctx: CanvasRenderingContext2D): void {
+        console.log("X is: " + this.location.x)
         ctx.save()
         ctx.fillStyle = this.color
-        console.log(`${ctx.fillStyle} , ${this.color}`)
         ctx.strokeStyle = "black"
         this.construct_coords().forEach(e => {
-            ctx.rect(e.x, e.y, 10, 10)
+            let new_e = e.scale(this.blockSize).add(this.topLHS)
+            ctx.beginPath()
+            console.log(new_e)
+            ctx.rect(new_e.x, new_e.y, this.blockSize, this.blockSize)
             ctx.fill()
             ctx.stroke()
         })
