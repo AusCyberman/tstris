@@ -16,13 +16,16 @@ class Game {
     score: number
     ctx: CanvasRenderingContext2D
     held: Shape
+    level: number
+    clearedLines: number
     currentBlock: Shape
     upcoming: Shape[]
     canHold: boolean
     blockSize: number
     blockMap: BlockMap
-    //  movementStack : ShapeCoords[]
     constructor(ctx: CanvasRenderingContext2D, gamePartBottomRHS: Vector2, entireCanvasBottomRHS: Vector2, startingGame = V2(0, 0,), blockSize = 10) {
+        this.level = 0
+        this.clearedLines = 0
         this.blockSize = blockSize
         this.canHold = true
         this.gameBottomRHS = gamePartBottomRHS
@@ -41,21 +44,39 @@ class Game {
     }
     randomSpawnLocation() {
         let val = V2(Math.floor(Math.random() * ((this.gameBottomRHS.x - (4 * this.blockSize)) / this.blockSize)), 0)
-        console.log("Val is", val, "Block size is: ", this.blockSize)
         return val
     }
     makeRandomShape(location: Vector2 = V2(0, 0)) {
         return new Shape(random_shape(), location, this.gameBottomRHS, this.blockSize)
     }
     checkScore() {
+        let clearedLines = 0
         this.blockMap.forEach((row, num) => {
-
             if (row.every(e => e != null)) {
                 this.blockMap.splice(num, 1);
-                this.score++
+                clearedLines++
                 this.blockMap.unshift(Array(this.width).fill(null));
             }
         })
+        this.level = Math.floor(this.clearedLines / 10)
+        console.log(clearedLines, this.clearedLines)
+        console.log(this.level)
+        const lvlmul = (x: number) => x * (this.level + 1)
+        switch (clearedLines) {
+            case 1:
+                this.score += lvlmul(40)
+                break
+            case 2:
+                this.score += lvlmul(100)
+                break
+            case 3:
+                this.score += lvlmul(300)
+                break
+            case 4:
+                this.score += lvlmul(1200)
+                break
+        }
+        this.clearedLines += clearedLines
     }
 
     drawGrid() {
@@ -102,7 +123,8 @@ class Game {
         this.ctx.beginPath()
         this.ctx.font = "50px "
         this.ctx.fillStyle = "blue"
-        this.ctx.fillText("Score: " + this.score, textX, textY, 80)
+        this.ctx.fillText("Level: " + this.level, textX, textY)
+        this.ctx.fillText("Score: " + this.score, textX, textY + 10, 80)
         this.ctx.restore()
     }
 
@@ -177,8 +199,6 @@ function tick(g: Game) {
 
     if (g.currentBlock.stopped) {
         for (const a of g.currentBlock.construct_coords()) {
-            console.log(g.blockMap)
-            console.log(a.y, a.x)
             if (a.y <= 0) {
                 g.ctx.fillStyle = "red"
                 g.ctx.font = "30px Bold"

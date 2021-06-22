@@ -178,17 +178,11 @@ export class Shape extends GameObject {
         let exist = false
         for (const b of vec) {
             if (b.x >= ((this.topLHS.x + this.bottomRHS.x) / this.blockSize) || b.x < 0) {
-                console.log(b.x)
                 exist = true
             }
-            console.log("B VALUES ARE: ", b.x, b.y)
-            console.log("TOTAL SIZE: ", ((this.bottomRHS.y - this.topLHS.y) / this.blockSize))
-            console.log("MAP SIZE: ",blockMap.length)
             if (((this.bottomRHS.y - this.topLHS.y) / this.blockSize) <= b.y) {
-                console.log("its out")
                 return "stop"
             } else if (blockMap[b.y][b.x] != null) {
-                console.log("has")
                 exist = true
                 if (this.construct_coords().some((e) => {
                     return e.y < b.y && e.x == b.x
@@ -226,7 +220,6 @@ export class Shape extends GameObject {
                     new_loc.y += 1
             }
             const status = this.validate(this.construct_coords(this.shape_vec, new_loc), blockMap)
-            console.log(status)
             switch (status) {
                 case "valid":
                     this.location = new_loc
@@ -234,8 +227,6 @@ export class Shape extends GameObject {
                 case "stop":
                     this.stopped = true
                     break
-                case "block":
-                    console.log("nothing")
             }
         }
     }
@@ -253,14 +244,12 @@ export class Shape extends GameObject {
         this.rotation = rotation
     }
     draw(ctx: CanvasRenderingContext2D): void {
-        console.log("X is: " + this.location.x)
         ctx.save()
         ctx.fillStyle = this.color
         ctx.strokeStyle = "black"
         this.construct_coords().forEach(e => {
             let new_e = e.scale(this.blockSize).add(this.topLHS)
             ctx.beginPath()
-            console.log(new_e)
             ctx.rect(new_e.x, new_e.y, this.blockSize, this.blockSize)
             ctx.fill()
             ctx.stroke()
