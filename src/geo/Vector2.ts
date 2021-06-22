@@ -41,9 +41,6 @@ export class Vector2 {
         return new Vector2(this.x*factor,this.y*factor)
     }
     
-    toTuple()  : [number, number]{
-        return [this.x,this.y]
-    }
 }
 
 export const V2: (x: number, y: number) => Vector2 = (x, y) => new Vector2(x, y)

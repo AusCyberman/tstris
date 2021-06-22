@@ -1,6 +1,7 @@
 import { GameObject } from "./GameObject"
 import { Direction, V2, Vector2, VectorMap } from "./geo/Vector2"
 import { BlockMap, random_shape, Shape, ShapeType, ShapeCoords } from "./shapes/Shape"
+import { clone } from "./util"
 
 
 
@@ -125,7 +126,7 @@ class Game {
     drawShadow() {
 
         if (this.currentBlock != null) {
-            var b = Object.assign(Object.create(Object.getPrototypeOf(this.currentBlock)), this.currentBlock);
+            var b = clone(this.currentBlock)
             while (b.stopped != true) {
                 b.move(Direction.Down, this.blockMap)
             }
@@ -200,10 +201,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
     const game = new Game(ctx, V2(280, 600), V2(800, 800), V2(0, 0), 20)
     window.setInterval(() => {
-        if(game.currentBlock != null) {
+        if (game.currentBlock != null) {
             game.currentBlock.move(Direction.Down, game.blockMap)
         }
-    },1000)
+    }, 1000)
     document.addEventListener("keydown", (event) => {
         switch (event.key) {
             case "ArrowRight":
