@@ -1,5 +1,5 @@
 import { GameObject } from '../GameObject'
-import { V2, Vector2, Direction, VectorMap } from '../geo/Vector2'
+import { V2, Vector2, Direction, } from '../geo/Vector2'
 
 export enum ShapeType {
     I = 0,
@@ -127,8 +127,6 @@ export function shape_factory(shape: ShapeType): ShapeData {
                         case Direction.Right:
                             return [V2(2, 0), V2(1, 1), V2(2, 1), V2(1, 2)]
                     }
-
-
                     //                    return [V2(0, 0), V2(1, 0), V2(1, 1), V2(2, 1)]
                 },
                 color: "red"

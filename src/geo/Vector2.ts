@@ -5,28 +5,20 @@ export enum Direction {
     Right
 }
 
+//export function listOfVectorToMatrix(list : Vector2[]): bool[][] {
+//    let b = list.reduceRight((e,v) => {
+//        if(v.y > e) {
+//            return v.y
+//        } else {
+//            return e
+//        }
+//    },0)
+//    let output = Array.from({length: b},Array.)
+//    list
+//}
 
 
 
-export class VectorMap<T>  extends Map<Vector2,T>{
-    has(e : Vector2) {
-        var exist = false
-       this.forEach((_,k) => {
-            if(k.x  == e.x && e.y == k.y)
-                exist = true
-       }) 
-        return exist
-
-    }
-    deleteKeys(vs : Vector2[]) {
-        this.forEach((_,k) => {
-            if(vs.some(e => k.x == e.x && k.y == e.y)) {
-                this.delete(k)
-            }
-        })
-    }
-
-}
 export class Vector2 {
     x: number
     y: number
