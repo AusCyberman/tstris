@@ -1,5 +1,5 @@
 import { GameObject } from "./GameObject"
-import { Direction, V2, Vector2, VectorMap } from "./geo/Vector2"
+import { Direction, V2, Vector2} from "./geo/Vector2"
 import { BlockMap, random_shape, Shape, ShapeType, ShapeCoords } from "./shapes/Shape"
 import { clone } from "./util"
 
