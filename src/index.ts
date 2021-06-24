@@ -22,8 +22,10 @@ class Game {
     upcoming: Shape[]
     canHold: boolean
     blockSize: number
+    paused: boolean
     blockMap: BlockMap
     constructor(ctx: CanvasRenderingContext2D, gamePartBottomRHS: Vector2, entireCanvasBottomRHS: Vector2, startingGame = V2(0, 0,), blockSize = 10) {
+        this.paused = false
         this.level = 0
         this.clearedLines = 0
         this.blockSize = blockSize
@@ -47,6 +49,10 @@ class Game {
         return val
     }
     makeRandomShape(location: Vector2 = V2(0, 0)) {
+        let shape = random_shape()
+        let blocks = this.upcoming.concat([this.currentBlock])
+        if(blocks.filter(x => shape == x.shape).length > 1)
+            shape = random_shape()
         return new Shape(random_shape(), location, this.gameBottomRHS, this.blockSize)
     }
     checkScore() {
@@ -54,8 +60,8 @@ class Game {
         this.blockMap.forEach((row, num) => {
             if (row.every(e => e != null)) {
                 this.blockMap.splice(num, 1);
+                this.blockMap.unshift(Array(this.width).fill(null))
                 clearedLines++
-                this.blockMap.unshift(Array(this.width).fill(null));
             }
         })
         this.level = Math.floor(this.clearedLines / 10)
@@ -226,6 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 1000)
     document.addEventListener("keydown", (event) => {
+        if (game.paused)
+            return
         switch (event.key) {
             case "ArrowRight":
                 game.move(Direction.Right)
