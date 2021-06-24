@@ -15,7 +15,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 9000,
+    port: process.env.PORT || 9000,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
